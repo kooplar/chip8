@@ -47,7 +47,7 @@ const std::string& Chip8::get_game_name() const
 void Chip8::init_opcode_to_func_map()
 {
     /* opcode_to_func[Chip8Opcodes::_ANNN] = [this](){index_register = opcode & 0x0FFF; pc += 2;}; */
-    opcode_to_func[Chip8Opcodes::_0NNN] = std::bind(&Chip8::do_0NNN, this);
+    /* opcode_to_func[Chip8Opcodes::_0NNN] = std::bind(&Chip8::do_0NNN, this); */
     /* opcode_to_func[Chip8Opcodes::_0NNN] = std::bind(&Chip8::do_0NNN, this); */
     /* opcode_to_func[Chip8Opcodes::_2NNN] = std::bind(&Chip8::do_2NNN, this); */
     /* opcode_to_func[Chip8Opcodes::_00E0] = std::bind(&Chip8::do_00E0, this); */
@@ -102,15 +102,13 @@ Chip8Opcodes Chip8::decode_opcode(unsigned short opcode)
 {
     Chip8Opcodes decoded_opcode{Chip8Opcodes::UNDEFINED};
 
-    opcode = memory[pc] << 8 | memory[pc + 1];
-
     switch(opcode & 0xF000)
     {
         case 0x0000:
             switch(opcode & 0x00FF)
             {
                 case 0x00E0:
-                    decoded_opcode = {Chip8Opcodes::_0NNN};
+                    decoded_opcode = {Chip8Opcodes::_00E0};
                     break;
                 case 0x00EE:
                     decoded_opcode = {Chip8Opcodes::_00EE};
@@ -147,7 +145,7 @@ Chip8Opcodes Chip8::decode_opcode(unsigned short opcode)
         dump_to_stdout();
         std::cout << "Unknown opcode hex: " << std::hex << opcode << " \n";
         std::cout << "Unknown opcode: " << opcode << " \n";
-        exit(1);
+        throw std::invalid_argument("bad opcode");
     }
     return decoded_opcode;
 }

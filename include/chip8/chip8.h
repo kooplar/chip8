@@ -52,7 +52,7 @@ class Chip8 {
 
         Chip8Opcodes decode_opcode(unsigned short opcode);
         const std::string& get_game_name() const;
-         void emulate_cycle();
+        void emulate_cycle();
 
         //define a stream operator << which will dump all the info
         // then we dont need to the dump function anymore
@@ -86,9 +86,6 @@ class Chip8 {
         void do_2NNN();
         void do_8XY4();
         void do_ANNN();
-
-
-
 
 };
 
