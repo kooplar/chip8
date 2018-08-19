@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <unordered_map>
 #include <functional>
@@ -50,7 +51,8 @@ class Chip8 {
         Chip8(const std::string& game_name);
 
         Chip8Opcodes decode_opcode(unsigned short opcode);
-        void emulate_cycle();
+        const std::string& get_game_name() const;
+         void emulate_cycle();
 
         //define a stream operator << which will dump all the info
         // then we dont need to the dump function anymore

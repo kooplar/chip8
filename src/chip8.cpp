@@ -1,11 +1,17 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <stdexcept>
 #include "chip8.h"
 #include "utils.h"
 
 namespace chip8 {
 
+std::unordered_map<Chip8Opcodes, std::function<void(Chip8&)>> Chip8::opcode_to_func =\
+{
+    {Chip8Opcodes::_0NNN, &Chip8::do_0NNN},
+    {Chip8Opcodes::_00E0, &Chip8::do_00E0}
+};
 
 Chip8::Chip8(const std::string& game_name):
     game_name{game_name}
@@ -20,8 +26,8 @@ Chip8::Chip8(const std::string& game_name):
 
     if (! rom.is_open())
     {
-        std::cout << "Could not open " << game_name << std::endl;
-        exit(1);
+        //TODO raise some exception here
+        throw std::invalid_argument("Could not open " + game_name);
     }
     rom.seekg(0, std::ios::end);
     size_t rom_size = rom.tellg();
@@ -30,13 +36,12 @@ Chip8::Chip8(const std::string& game_name):
 
     // TODO test if rom will fit in ram, check for larger than some size
     rom.read((char*)&(memory[0x200]), rom_size);
-
 }
-std::unordered_map<Chip8Opcodes, std::function<void(Chip8&)>> Chip8::opcode_to_func =\
+
+const std::string& Chip8::get_game_name() const
 {
-    {Chip8Opcodes::_0NNN, &Chip8::do_0NNN},
-    {Chip8Opcodes::_00E0, &Chip8::do_00E0}
-};
+    return game_name;
+}
 
 
 void Chip8::init_opcode_to_func_map()
