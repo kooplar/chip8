@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.2)
-project (chip8-test)
+project (test)
 # The version number.
 set (Tutorial_VERSION_MAJOR 1)
 set (Tutorial_VERSION_MINOR 0)
@@ -11,20 +11,20 @@ configure_file (
   "${PROJECT_BINARY_DIR}/chip8_test_config.h"
   )
 # add the binary tree to the search path for include files
-# so that we will find TutorialConfig.h
+# so that we will find chip8_test_config.h
 include_directories("${PROJECT_BINARY_DIR}")
 
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+  WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-download )
 if(result)
   message(FATAL_ERROR "CMake step for googletest failed: ${result}")
 endif()
 execute_process(COMMAND ${CMAKE_COMMAND} --build .
   RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+  WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-download )
 if(result)
   message(FATAL_ERROR "Build step for googletest failed: ${result}")
 endif()
@@ -48,4 +48,4 @@ endif()
 
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(chip8-test chip8_test.cpp)
-target_link_libraries(chip8-test gtest_main)
+target_link_libraries(chip8-test chip8_lib gtest_main)

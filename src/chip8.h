@@ -1,4 +1,7 @@
+#pragma once
 #include <string>
+#include <unordered_map>
+#include <functional>
 
 namespace chip8{
 
@@ -43,6 +46,15 @@ enum class Chip8Opcodes
 };
 
 class Chip8 {
+    public:
+        Chip8(const std::string& game_name);
+
+        Chip8Opcodes decode_opcode(unsigned short opcode);
+        void emulate_cycle();
+
+        //define a stream operator << which will dump all the info
+        // then we dont need to the dump function anymore
+
     /* systems memory map: */
     /* 0x000-0x1FF - Chip 8 interpreter (contains font set in emu) */
     /* 0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F) */
@@ -59,21 +71,21 @@ class Chip8 {
         unsigned char sound_timer{};
         unsigned short stack[16]{};
         unsigned short sp{}; //stack pointer
-        unsigned char key[16]{}; // hex [based keypabed 0x0-0xF
-
+        unsigned char key[16]{}; // hex based keypad 0x0-0xF
         std::string game_name;
+        static std::unordered_map<Chip8Opcodes, std::function<void(Chip8&)>> opcode_to_func;
 
         std::string dump() const;
         void dump_to_stdout() const;
+        void init_opcode_to_func_map();
+        void do_0NNN();
+        void do_00E0();
+        void do_00EE();
+        void do_2NNN();
+        void do_8XY4();
+        void do_ANNN();
 
-        //fetch opcode
-        //decode opcode
 
-    public:
-        Chip8(const std::string& game_name);
-
-        Chip8Opcodes decode_opcode(unsigned short opcode);
-        void emulate_cycle();
 
 
 };

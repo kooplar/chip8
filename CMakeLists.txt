@@ -1,0 +1,5 @@
+cmake_minimum_required (VERSION 2.8.2)
+project (CHIP8EMU)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/${CMAKE_BUILD_TYPE})
+add_subdirectory (src)
+add_subdirectory (test)
