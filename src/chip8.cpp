@@ -105,37 +105,130 @@ Chip8Opcodes Chip8::decode_opcode(unsigned short opcode)
     switch(opcode & 0xF000)
     {
         case 0x0000:
-            switch(opcode & 0x00FF)
+            switch(opcode & 0x0FFF)
             {
                 case 0x00E0:
-                    decoded_opcode = {Chip8Opcodes::_00E0};
+                    decoded_opcode = Chip8Opcodes::_00E0;
                     break;
                 case 0x00EE:
-                    decoded_opcode = {Chip8Opcodes::_00EE};
+                    decoded_opcode = Chip8Opcodes::_00EE;
                     break;
                 default:
-                    decoded_opcode = {Chip8Opcodes::UNDEFINED};
+                    decoded_opcode = Chip8Opcodes::_0NNN;
                     break;
             }
             break;
 
-        case 0xA000:
-            decoded_opcode = Chip8Opcodes::_ANNN;
+        case 0x1000:
+            decoded_opcode = Chip8Opcodes::_1NNN;
             break;
         case 0x2000:
             decoded_opcode = Chip8Opcodes::_2NNN;
             break;
-
-        // 0x8XY#
+        case 0x3000:
+            decoded_opcode = Chip8Opcodes::_3XNN;
+            break;
+        case 0x4000:
+            decoded_opcode = Chip8Opcodes::_4XNN;
+            break;
+        case 0x5000:
+            decoded_opcode = Chip8Opcodes::_5XY0;
+            break;
+        case 0x6000:
+            decoded_opcode = Chip8Opcodes::_6XNN;
+            break;
+        case 0x7000:
+            decoded_opcode = Chip8Opcodes::_7XNN;
+            break;
         case 0x8000:
             switch(opcode & 0x000F)
             {
+                case 0x0000:
+                    decoded_opcode = Chip8Opcodes::_8XY0;
+                    break;
+                case 0x0001:
+                    decoded_opcode = Chip8Opcodes::_8XY1;
+                    break;
+                case 0x0002:
+                    decoded_opcode = Chip8Opcodes::_8XY2;
+                    break;
+                case 0x0003:
+                    decoded_opcode = Chip8Opcodes::_8XY3;
+                    break;
                 case 0x0004:
                     decoded_opcode = Chip8Opcodes::_8XY4;
                     break;
+                case 0x0005:
+                    decoded_opcode = Chip8Opcodes::_8XY5;
+                    break;
+                case 0x0006:
+                    decoded_opcode = Chip8Opcodes::_8XY6;
+                    break;
+                case 0x0007:
+                    decoded_opcode = Chip8Opcodes::_8XY7;
+                    break;
+                case 0x000E:
+                    decoded_opcode = Chip8Opcodes::_8XYE;
+                    break;
             }
             break;
-
+        case 0x9000:
+            return Chip8Opcodes::_9XY0;
+        case 0xA000:
+            decoded_opcode = Chip8Opcodes::_ANNN;
+            break;
+        case 0xB000:
+            decoded_opcode = Chip8Opcodes::_BNNN;
+            break;
+        case 0xC000:
+            decoded_opcode = Chip8Opcodes::_CXNN;
+            break;
+        case 0xD000:
+            decoded_opcode = Chip8Opcodes::_DXYN;
+            break;
+        case 0xE000:
+            switch(opcode & 0x000F)
+            {
+                case 0x000E:
+                    decoded_opcode = Chip8Opcodes::_EX9E;
+                    break;
+                case 0x0001:
+                    decoded_opcode = Chip8Opcodes::_EXA1;
+                    break;
+            }
+            break;
+        case 0xF000:
+            switch(opcode & 0x00FF)
+            {
+                case 0x0007:
+                    decoded_opcode = Chip8Opcodes::_FX07;
+                    break;
+                case 0x000A:
+                    decoded_opcode = Chip8Opcodes::_FX0A;
+                    break;
+                case 0x0015:
+                    decoded_opcode = Chip8Opcodes::_FX15;
+                    break;
+                case 0x0018:
+                    decoded_opcode = Chip8Opcodes::_FX18;
+                    break;
+                case 0x001E:
+                    decoded_opcode = Chip8Opcodes::_FX1E;
+                    break;
+                case 0x0029:
+                    decoded_opcode = Chip8Opcodes::_FX29;
+                    break;
+                case 0x0033:
+                    decoded_opcode = Chip8Opcodes::_FX33;
+                    break;
+                case 0x0055:
+                    decoded_opcode = Chip8Opcodes::_FX55;
+                    break;
+                case 0x0065:
+                    decoded_opcode = Chip8Opcodes::_FX65;
+                    break;
+            }
+            break;
         default:
             decoded_opcode = {Chip8Opcodes::UNDEFINED};
     }
@@ -150,15 +243,6 @@ Chip8Opcodes Chip8::decode_opcode(unsigned short opcode)
     return decoded_opcode;
 }
 
-//TODO create a map of <opcode, function>
-// where opcode is some constant given by the decode(opcode)
-// and returns something like OPCODE_0000. then just call the function
-// at that index and pass in the opcode
-// could just declare a whole bunch of (35) opcode functions
-// or maybe std::function
-// * create google tests for the decode(), then add all possible decodes
-// * add google tests for every opcode
-// * then look at the gfx stuff
 void Chip8::emulate_cycle()
 {
     // fetch opcode
