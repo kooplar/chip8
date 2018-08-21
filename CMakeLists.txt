@@ -3,6 +3,7 @@ project (chip8)
 set (CHIP8_VERSION_MAJOR 1)
 set (CHIP8_VERSION_MINOR 0)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/${CMAKE_BUILD_TYPE})
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1) # for Ycm/vim
 
 # configure a header file to pass some of the CMake settings
 # to the source code
