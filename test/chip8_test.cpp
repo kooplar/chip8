@@ -2,17 +2,46 @@
 #include "chip8.h"
 #include "gtest/gtest.h"
 #include <iostream>
+#include <algorithm>
+#include <stdint.h>
 
-TEST(TestChip8, Chip8_constructor)
+
+const char* const test_rom = "../test/data/test_rom_1";
+
+TEST(TestChip8, Chip8Constructor)
 {
     ASSERT_THROW(chip8::Chip8 chip8("invalid_game_path"), std::invalid_argument);
 }
 
-TEST(TestChip8, Chip8_decode_opcode)
+TEST(TestChip8, Chip8do00E0)
+{
+    chip8::Chip8 chip8(test_rom);
+    const chip8::Chip8Internals& internals = chip8.get_internals();
+
+    chip8.do_opcode(0x00E0);
+    bool gfx_all_zeroes = std::all_of(internals.gfx.begin(), internals.gfx.end(),
+            [](uint16_t i){return i == 0;});
+    ASSERT_EQ(gfx_all_zeroes, true);
+}
+
+TEST(TestChip8, Chip8do2NNN)
+{
+    chip8::Chip8 chip8("../test/data/test_rom_1");
+    const chip8::Chip8Internals& internals = chip8.get_internals();
+
+    chip8.do_opcode(0x2234);
+    bool stack_all_zeroes = std::all_of(internals.stack.begin(), internals.stack.end(),
+            [](uint16_t i){return i == 0;});
+    ASSERT_EQ(stack_all_zeroes, true);
+    ASSERT_EQ(internals.pc, 0x0234);
+    ASSERT_EQ(internals.sp, 1);
+}
+
+TEST(TestChip8, Chip8DecodeOpcode)
 {
     //TODO fixhard coding of this path
     chip8::Chip8 chip8("../test/data/test_rom_1");
-    unsigned short opcode{};
+    uint16_t opcode{};
 
     opcode = 0x0123;
     EXPECT_EQ(chip8::Chip8Opcodes::_0NNN, chip8.decode_opcode(opcode));
@@ -101,7 +130,6 @@ TEST(TestChip8, Chip8_decode_opcode)
     EXPECT_EQ(chip8::Chip8Opcodes::_FX55, chip8.decode_opcode(opcode));
     opcode = 0xF165;
     EXPECT_EQ(chip8::Chip8Opcodes::_FX65, chip8.decode_opcode(opcode));
-
 }
 
 int main(int argc, char **argv)
