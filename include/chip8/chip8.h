@@ -76,6 +76,7 @@ class Chip8
         static Chip8Opcodes decode_opcode(uint16_t opcode);
         const std::string& get_game_name() const;
         const Chip8Internals& get_internals() const;
+        bool draw = false;
         void reset();
         void do_opcode(uint16_t opcode);
         void emulate_cycle();
@@ -85,11 +86,9 @@ class Chip8
         // then we dont need to the dump function anymore
 
     private:
-        bool draw = false;
         std::string game_name;
         Chip8Internals internals;
-        static std::unordered_map<Chip8Opcodes, 
-                                  std::function<void(Chip8&, uint16_t)>> opcode_to_func;
+        static std::unordered_map<Chip8Opcodes, std::function<void(Chip8&, uint16_t)>> opcode_to_func;
 
         std::string dump() const;
         void dump_to_stdout() const;

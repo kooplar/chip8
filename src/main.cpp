@@ -1,9 +1,16 @@
 #include <iostream>
-#include "chip8.h"
-
 #include <chrono>
 #include <thread>
 
+#include "chip8.h"
+
+#include "chip8_gfx_terminal.h"
+
+
+//TODO: a class called Chip8System which takes
+//the chip8 emu class, the screen (gfx), the sound, then does
+//the whole emulation look when you call .start on it (or option to do one
+//cycle at a time
 
 using namespace chip8;
 
@@ -20,17 +27,24 @@ int main(int argc, char **argv)
         usage(argv[0]);
         exit(2);
     }
-    //set up graphics
-    //set up input
 
     Chip8 chip8(argv[1]);
-    /* exit(0); */
+    //set up graphics
+    Chip8GfxTerminal gfx(chip8.get_internals());
+    //set up input
+    //set up sound
 
-    //emulaion loop
+    //emulation loop
     for(;;)
     {
         chip8.emulate_cycle();
-        std::this_thread::sleep_for(std::chrono::milliseconds(000));
+        if(chip8.draw)
+        {
+            chip8.dump_internals();
+            gfx.draw();
+            chip8.draw = false;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(050));
         /* usleep(100000); */
         //chip 8 emulate one cycle
         //if draw==true, draw screen. the system does not draw every cycle

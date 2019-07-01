@@ -16,7 +16,6 @@ configure_file (
 include_directories("${PROJECT_BINARY_DIR}")
 
 
-# Now simply link against gtest or gtest_main as needed. Eg
 add_library (chip8_lib src/chip8.cpp src/utils.cpp )
 target_include_directories(chip8_lib
     PUBLIC
@@ -28,8 +27,19 @@ target_include_directories(chip8_lib
 target_compile_options(chip8_lib PRIVATE -Werror)
 target_compile_features(chip8_lib PRIVATE cxx_std_11)
 
+add_library (chip8_lib_gfx_terminal src/chip8_gfx.cpp src/chip8_gfx_terminal.cpp)
+target_include_directories(chip8_lib_gfx_terminal
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/chip8> # fix include
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+target_compile_options(chip8_lib_gfx_terminal PRIVATE -Werror)
+target_compile_features(chip8_lib_gfx_terminal PRIVATE cxx_std_11)
+
 
 add_executable(chip8 src/main.cpp)
-target_link_libraries(chip8 chip8_lib)
+target_link_libraries(chip8 chip8_lib chip8_lib_gfx_terminal)
 
 add_subdirectory (test)

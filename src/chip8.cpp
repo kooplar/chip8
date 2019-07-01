@@ -176,6 +176,8 @@ void Chip8::init_opcode_to_func_map()
 
 
 
+// TODO take a stream reference, then can just pass in a
+// stdout or stringstream ifwe want to get the string out
 std::string Chip8::dump() const
 {
     std::string output("Memory:\n");
@@ -347,61 +349,6 @@ void Chip8::emulate_cycle()
 
     do_opcode(opcode);
 
-    // this should notgo here!
-    if(draw)
-    {
-        draw = false;
-        dump_internals();
-        std::cout << "Drawing on screen\n";
-        for(int y=0; y<32; y++)
-        {
-            break;
-            /* for(int x=0;x<64; x++) */
-            /* for(int x=12;x<38; x++) */
-            for(int x=0;x<24; x++)
-            {
-
-                uint8_t byte = internals.gfx[(y * 64) + x];
-                if(byte & 0x80)
-                    printf("*");
-                else
-                    printf(" ");
-                if(byte & 0x40)
-                    printf("*");
-                else
-                    printf(" ");
-                if(byte & 0x20)
-                    printf("*");
-                else
-                    printf(" ");
-                if(byte & 0x10)
-                    printf("*");
-                else
-                    printf(" ");
-                if(byte & 0x08)
-                    printf("*");
-                else
-                    printf(" ");
-                if(byte & 0x04)
-                    printf("*");
-                else
-                    printf(" ");
-                if(byte & 0x02)
-                    printf("*");
-                else
-                    printf(" ");
-                if(byte & 0x01)
-                    printf("*");
-                else
-                    printf(" ");
-                /* if(byte) */
-                /*     std::cout << "[byte was on (x,y): (" << static_cast<int>(x)  << "," <<  static_cast<int>(y) <<  ")]" ; */
-
-            }
-            printf("|\n");
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
 
     // Update timers
     if(internals.delay_timer > 0)
@@ -555,22 +502,24 @@ void Chip8::do_DXYN(uint16_t opcode)
     internals.V[0xF] = 0;
     draw=true;
     std::cout << std::dec << "adding sprite to (X,Y,h) (" << static_cast<int>(X) << "," << static_cast<int>(Y) << "," << static_cast<int>(height) << ")" << "  opcode hex " << std::hex << opcode << "\n";
-    
+
     for (int yline = 0; yline < height; yline++)
-      {
+    {
         pixel = internals.memory[internals.I + yline];
         std::cout << std::hex << "adding " << pixel << "\n";
         for(int xline = 0; xline < 8; xline++)
         {
-          if((pixel & (0x80 >> xline)) != 0)
-          {
-            if(internals.gfx[(X + xline + ((Y + yline) * 64)) % 2048 ] == 1)
-              internals.V[0xF] = 1;                                 
-            std::cout << std::dec << " adding " << xline <<  "X,Y " << X+xline << "," << Y+yline  << "\n";
-            internals.gfx[X + xline + ((Y + yline) * 64) % 2048] ^= 1;
-          }
+            if((pixel & (0x80 >> xline)) != 0)
+            {
+                if(internals.gfx[(X + xline + ((Y + yline) * 64)) % 2048 ] == 1)
+                {
+                  internals.V[0xF] = 1;
+                }
+                std::cout << std::dec << " adding " << xline <<  "X,Y " << X+xline << "," << Y+yline  << "\n";
+                internals.gfx[X + xline + ((Y + yline) * 64) % 2048] ^= 1;
+            }
         }
-      }
+    }
 }
 /* void Chip8::do_DXYN(uint16_t opcode) */
 /* { */
@@ -700,17 +649,18 @@ void Chip8::dump_internals()
                << static_cast<uint16_t>(internals.gfx[i]);
     }
 
-    output << "\nGraphics at a glance";
-    for(int i =0 ; i <internals.gfx.size(); i++)
-    {
-        if( (i % 64) == 0)
-            output << "\n" << std::setfill('0') << std::setw(4) << i << " ";
-        if (internals.gfx[i])
-            output << "█";
-        else
-            output << ".";
-    }
-    output << "\n";
+    /* output << "\nGraphics at a glance"; */
+    /* for(int i =0 ; i <internals.gfx.size(); i++) */
+    /* { */
+    /*     if( (i % 64) == 0) */
+    /*         output << "\n" << std::setfill('0') << std::setw(4) << i << " "; */
+    /*     if (internals.gfx[i]) */
+    /*         output << "█"; */
+    /*     else */
+    /*         output << "."; */
+    /* } */
+    /* output << "\n"; */
+
     std::cout << output.str();
 
 
