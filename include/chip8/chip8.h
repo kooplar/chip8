@@ -55,10 +55,10 @@ struct Chip8Internals
     /* 0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F) */
     /* 0x200-0xFFF - Program ROM and work RAM */
     std::array<uint8_t, 4096> memory;
-    std::array<uint8_t, 16> stack;
+    std::array<uint16_t, 16> stack;
     std::array<uint8_t, 16> V;  //15 general regsiters + carry flag
     std::array<uint8_t, 64 * 32> gfx; // screen size is 64 x 32
-    uint16_t key; // hex based keypad 0x0-0xF; 1 = pressed 0 = not pressed
+    uint8_t key[16]; // hex based keypad 0x0-0xF; 1 = pressed 0 = not pressed
     uint16_t I; //16 bit register for memory adresses
     uint16_t pc; //program counter
     uint16_t sp; //stack pointer

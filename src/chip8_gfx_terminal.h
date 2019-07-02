@@ -8,6 +8,7 @@ class Chip8GfxTerminal : public Chip8Gfx
     public:
         Chip8GfxTerminal(const Chip8Internals &chip8_internals);
         void draw();
+        void get_keypress();
 
 };
 

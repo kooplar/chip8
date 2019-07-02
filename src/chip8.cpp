@@ -63,7 +63,7 @@ Chip8::Chip8(const std::string& game_name):
     internals.pc = 0x200;
 
     std::array<uint8_t, 80> fontset =
-        { 
+        {
           0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
           0x20, 0x60, 0x20, 0x20, 0x70, // 1
           0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -180,7 +180,7 @@ void Chip8::init_opcode_to_func_map()
 // stdout or stringstream ifwe want to get the string out
 std::string Chip8::dump() const
 {
-    std::string output("Memory:\n");
+    std::string output("Memory dump:\n");
     std::string mem_in_string((char*)&internals.memory, internals.memory.size());
     output.append(string_to_hex(mem_in_string));
 
@@ -195,6 +195,10 @@ void Chip8::dump_to_stdout() const
 Chip8Opcodes Chip8::decode_opcode(uint16_t opcode)
 {
     Chip8Opcodes decoded_opcode{Chip8Opcodes::UNDEFINED};
+
+    std::stringstream ss;
+    ss << std::hex << opcode <<  "\n";
+    /* std::cout << "OPCODE: " << ss.str(); */
 
     switch(opcode & 0xF000)
     {
@@ -324,6 +328,7 @@ Chip8Opcodes Chip8::decode_opcode(uint16_t opcode)
             break;
         default:
             decoded_opcode = {Chip8Opcodes::UNDEFINED};
+            break;
     }
 
     if(decoded_opcode == Chip8Opcodes::UNDEFINED)
@@ -345,7 +350,7 @@ void Chip8::emulate_cycle()
     //merge 2 bytes from memory
     uint16_t opcode = internals.memory[internals.pc] << 8 | internals.memory[internals.pc + 1];
     internals.pc += 2;
-    /* std::cout << "pc is now at " << std::hex << internals.pc << " got opcode " << std::hex << opcode << " \n"; */
+    /* std::cout << "pc is now at " << std::hex << internals.pc << " got opcode " << std::hex << opcode << "\n"; */
 
     do_opcode(opcode);
 
@@ -371,8 +376,10 @@ void Chip8::do_opcode(uint16_t opcode)
 
 void Chip8::do_0NNN(uint16_t opcode)
 {
-    std::cerr << "Detected use of opcode 0NNN";
-    throw "opcdoe 0NNN should not be used";
+    std::stringstream ss;
+    ss << std::hex << opcode << "\n";
+    std::cerr << "Detected use of opcode 0NNN " << ss.str();
+    /* throw "opcdoe 0NNN should not be used"; */
 }
 void Chip8::do_00E0(uint16_t opcode)
 {
@@ -501,12 +508,12 @@ void Chip8::do_DXYN(uint16_t opcode)
     uint16_t pixel = 0;
     internals.V[0xF] = 0;
     draw=true;
-    std::cout << std::dec << "adding sprite to (X,Y,h) (" << static_cast<int>(X) << "," << static_cast<int>(Y) << "," << static_cast<int>(height) << ")" << "  opcode hex " << std::hex << opcode << "\n";
+    /* std::cout << std::dec << "adding sprite to (X,Y,h) (" << static_cast<int>(X) << "," << static_cast<int>(Y) << "," << static_cast<int>(height) << ")" << "  opcode hex " << std::hex << opcode << "\n"; */
 
     for (int yline = 0; yline < height; yline++)
     {
         pixel = internals.memory[internals.I + yline];
-        std::cout << std::hex << "adding " << pixel << "\n";
+        /* std::cout << std::hex << "adding " << pixel << "\n"; */
         for(int xline = 0; xline < 8; xline++)
         {
             if((pixel & (0x80 >> xline)) != 0)
@@ -515,7 +522,7 @@ void Chip8::do_DXYN(uint16_t opcode)
                 {
                   internals.V[0xF] = 1;
                 }
-                std::cout << std::dec << " adding " << xline <<  "X,Y " << X+xline << "," << Y+yline  << "\n";
+                /* std::cout << std::dec << " adding " << xline <<  "X,Y " << X+xline << "," << Y+yline  << "\n"; */
                 internals.gfx[X + xline + ((Y + yline) * 64) % 2048] ^= 1;
             }
         }
@@ -549,12 +556,12 @@ void Chip8::do_DXYN(uint16_t opcode)
 
 void Chip8::do_EX9E(uint16_t opcode)
 {
-    if(internals.key & (internals.V[(opcode & 0x0F00) >> 8]))
+    if(internals.key[(internals.V[(opcode & 0x0F00) >> 8])] == 1)
         internals.pc += 2;
 }
 void Chip8::do_EXA1(uint16_t opcode)
 {
-    if(internals.key ^ (internals.V[(opcode & 0x0F00) >> 8]))
+    if(internals.key[(internals.V[(opcode & 0x0F00) >> 8])] == 1)
         internals.pc += 2;
 }
 void Chip8::do_FX07(uint16_t opcode)
@@ -616,7 +623,10 @@ void Chip8::dump_internals()
     std::stringstream output;
 
     output << "\n";
-    output << "keys [" << std::bitset<16>(internals.key) << "]\n";
+    output << "keys [";
+    for(int i=0; i<=15; i++)
+        output << internals.key[i];
+    output << "]\n";
     output << "I    [" << std::hex << internals.I << "]\n";
     output << "pc   [" << std::hex << internals.pc << "]\n";
     output << "sp   [" << std::hex << internals.sp << "]\n";
@@ -636,18 +646,18 @@ void Chip8::dump_internals()
     {
         if( i % 40 == 0)
             output << "\n" << std::setfill('0') << std::setw(4) << i << " ";
-        output << std::setfill('0') << std::setw(2) << std::dec
+        output << std::setfill('0') << std::setw(2) << std::hex
                << static_cast<uint16_t>(internals.memory[i]);
     }
 
-    output << "\nGraphics";
-    for(int i = 0; i < internals.gfx.size(); i++)
-    {
-        if(i % 64 == 0)
-            output << "\n" << std::setfill('0') << std::setw(4) << i << " ";
-        output << std::setfill('0') << std::setw(2) << std::hex
-               << static_cast<uint16_t>(internals.gfx[i]);
-    }
+    /* output << "\nGraphics"; */
+    /* for(int i = 0; i < internals.gfx.size(); i++) */
+    /* { */
+    /*     if(i % 64 == 0) */
+    /*         output << "\n" << std::setfill('0') << std::setw(4) << i << " "; */
+    /*     output << std::setfill('0') << std::setw(2) << std::hex */
+    /*            << static_cast<uint16_t>(internals.gfx[i]); */
+    /* } */
 
     /* output << "\nGraphics at a glance"; */
     /* for(int i =0 ; i <internals.gfx.size(); i++) */

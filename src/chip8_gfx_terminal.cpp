@@ -28,5 +28,12 @@ void Chip8GfxTerminal::draw()
 
 }
 
+// should be in a thread so it doesnt block main loop
+void Chip8GfxTerminal::get_keypress()
+{
+    int c = getchar();
+    uint8_t cc = static_cast<uint8_t>(c);
+}
+
 
 }

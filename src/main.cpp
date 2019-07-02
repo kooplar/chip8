@@ -37,17 +37,20 @@ int main(int argc, char **argv)
     //emulation loop
     for(;;)
     {
+        try{
         chip8.emulate_cycle();
+        } catch(std::exception){
+            chip8.dump_internals();
+            exit(1);
+        }
+        /* chip8.dump_internals(); */
         if(chip8.draw)
         {
             chip8.dump_internals();
             gfx.draw();
             chip8.draw = false;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(050));
-        /* usleep(100000); */
-        //chip 8 emulate one cycle
-        //if draw==true, draw screen. the system does not draw every cycle
+        std::this_thread::sleep_for(std::chrono::milliseconds(040));
         //read key press
         /* break; */
     }
