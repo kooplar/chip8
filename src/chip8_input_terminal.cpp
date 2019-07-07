@@ -9,6 +9,8 @@
 //TODO this class should only fetch a keypress then return a value
 //for the array index that chip8 should mark as a key pressed
 //so chip8.h needs a definition of mapping of what each key pressed means
+//
+//TODO could use ncurses to poll keys as well
 
 
 namespace chip8{
@@ -62,10 +64,16 @@ void reset_termios(void)
     tcsetattr(0, TCSANOW, &old_settings);
 }
 
-void read_keys(){
-    char c = getchar();
-    int array_index = keypad[static_cast<uint8_t>(c)];
-    keys_pressed[array_index] = 1;
+void read_keys(uint8_t *keys){
+    // while !stop_reading_keys
+    while(true)
+    {
+        char c = getchar();
+        int array_index = keypad[static_cast<uint8_t>(c)];
+        keys_pressed[array_index] = 1;
+        keys[array_index] = 1;
+        /* std::cout << "Got press, index:" << c <<", " << array_index <<std::endl; */
+    }
 }
 
 } // anon namespace
@@ -74,7 +82,7 @@ Chip8InputTerminal::Chip8InputTerminal(Chip8Internals &chip8_internals) : Chip8I
 /* Chip8InputTerminal::Chip8InputTerminal(const Chip8Internals &chip8_internals) : Chip8Input(chip8_internals) */
 {
     init_termios(false);
-    std::thread t(read_keys);
+    std::thread t(read_keys, std::ref(chip8_internals.key));
     t.detach();
 }
 

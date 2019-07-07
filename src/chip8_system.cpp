@@ -1,5 +1,7 @@
 #include "chip8_system.h"
 
+#include <thread>
+
 namespace chip8{
 
 Chip8System::Chip8System(Chip8 *chip8, Chip8Gfx *gfx, Chip8Input *input):
@@ -13,9 +15,7 @@ void Chip8System::run(){
     {
         try{
 
-            /* input.read_keypress(); */
             m_chip8->emulate_cycle();
-            /* input.clear_keypress(); */
         } catch(std::exception){
             m_chip8->dump_internals();
             exit(1);
@@ -24,12 +24,14 @@ void Chip8System::run(){
         if(m_chip8->draw)
         {
             m_chip8->dump_internals();
-            m_input->clear_keypress();
             m_gfx->draw();
             m_chip8->draw = false;
-            m_input->read_keypress();
+            /* m_input->read_keypress(); */
+            //TODO this still causes some input to be missed
+            m_input->clear_keypress();
+            //60fps 1000 milli / 60 = 16
+            std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
-        /* std::this_thread::sleep_for(std::chrono::milliseconds(020)); */
     }
 }
 
