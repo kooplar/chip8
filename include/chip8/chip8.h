@@ -81,13 +81,15 @@ class Chip8
         void do_opcode(uint16_t opcode);
         void emulate_cycle();
         void dump_internals();
+        // TODO internals should NOT be public, but moving for now to ease development
+        Chip8Internals internals;
 
         //define a stream operator << which will dump all the info
         // then we dont need to the dump function anymore
 
     private:
         std::string game_name;
-        Chip8Internals internals;
+        /* Chip8Internals internals; */
         static std::unordered_map<Chip8Opcodes, std::function<void(Chip8&, uint16_t)>> opcode_to_func;
 
         std::string dump() const;

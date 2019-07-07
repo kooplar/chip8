@@ -625,7 +625,7 @@ void Chip8::dump_internals()
     output << "\n";
     output << "keys [";
     for(int i=0; i<=15; i++)
-        output << internals.key[i];
+        output << static_cast<int>(internals.key[i]);
     output << "]\n";
     output << "I    [" << std::hex << internals.I << "]\n";
     output << "pc   [" << std::hex << internals.pc << "]\n";

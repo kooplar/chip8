@@ -5,6 +5,9 @@
 #include "chip8.h"
 
 #include "chip8_gfx_terminal.h"
+#include "chip8_input_terminal.h"
+
+#include "chip8_system.h"
 
 
 //TODO: a class called Chip8System which takes
@@ -31,28 +34,40 @@ int main(int argc, char **argv)
     Chip8 chip8(argv[1]);
     //set up graphics
     Chip8GfxTerminal gfx(chip8.get_internals());
+    Chip8InputTerminal input(chip8.internals);
+
+    //TODO shared ptr
+    Chip8System chip8_system(&chip8, &gfx, &input);
+    /* Chip8GfxTerminal gfx(chip8.get_internals()); */
     //set up input
     //set up sound
 
     //emulation loop
-    for(;;)
+    for (;;)
     {
-        try{
-        chip8.emulate_cycle();
-        } catch(std::exception){
-            chip8.dump_internals();
-            exit(1);
-        }
-        /* chip8.dump_internals(); */
-        if(chip8.draw)
-        {
-            chip8.dump_internals();
-            gfx.draw();
-            chip8.draw = false;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(040));
-        //read key press
-        /* break; */
+        chip8_system.run();
     }
+    /* for(;;) */
+    /* { */
+    /*     try{ */
+
+    /*         /1* input.read_keypress(); *1/ */
+    /*         chip8.emulate_cycle(); */
+    /*         /1* input.clear_keypress(); *1/ */
+    /*     } catch(std::exception){ */
+    /*         chip8.dump_internals(); */
+    /*         exit(1); */
+    /*     } */
+    /*     /1* chip8.dump_internals(); *1/ */
+    /*     if(chip8.draw) */
+    /*     { */
+    /*         chip8.dump_internals(); */
+    /*         input.clear_keypress(); */
+    /*         gfx.draw(); */
+    /*         chip8.draw = false; */
+    /*         input.read_keypress(); */
+    /*     } */
+    /*     /1* std::this_thread::sleep_for(std::chrono::milliseconds(020)); *1/ */
+    /* } */
 
 }
