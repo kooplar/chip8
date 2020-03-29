@@ -30,7 +30,8 @@ void Chip8System::run(){
             //TODO this still causes some input to be missed
             m_input->clear_keypress();
             //60fps 1000 milli / 60 = 16
-            std::this_thread::sleep_for(std::chrono::milliseconds(16));
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            /* std::this_thread::sleep_for(std::chrono::milliseconds(16)); */
         }
     }
 }
